@@ -1,1 +1,19 @@
+name: Submit URLs to IndexNow
+on: [push]  # 在每次代码推送时触发
 
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Submit to IndexNow
+        uses: IndexNow/IndexNow-action@v1.0.0
+        with:
+          key: ${{ secrets.INDEXNOW_KEY }}  # 在 GitHub Secrets 中存储你的 API Key
+          host: 'zhulingyu666.github.io'
+          urls: |
+            https://zhulingyu666.github.io/
+          # 或者，如果你有 sitemap，可以直接指定 sitemap URL
+          # sitemap: 'https://zhulingyu666.github.io/sitemap.xml'
