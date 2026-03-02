@@ -468,27 +468,31 @@ class LazyImg {
     const wrap = document.createElement('div');
     wrap.className = 'lazy-img-container';
 
+    // 先给一个默认比例，防止高度为0
+    wrap.style.paddingTop = '75%';
+
     const thumbImg = document.createElement('img');
     thumbImg.className = 'lazy-img-thumb';
     thumbImg.src = thumbSrc;
 
     const fullImg = document.createElement('img');
     fullImg.className = 'lazy-img-full';
-    fullImg.src = fullSrc; // 👈 修复：提前加载
+    fullImg.src = fullSrc;
 
     wrap.appendChild(thumbImg);
     wrap.appendChild(fullImg);
     el.replaceWith(wrap);
 
-    // 自动算比例
+    // 加载图片，成功就替换比例
     const tempImg = new Image();
     tempImg.src = fullSrc;
+
     tempImg.onload = () => {
       const ratio = tempImg.width / tempImg.height;
       wrap.style.paddingTop = (100 / ratio) + '%';
     };
 
-    // 加载完渐显
+    // 高清图加载完就显示
     fullImg.onload = () => {
       fullImg.classList.add('loaded');
     };
@@ -498,7 +502,6 @@ class LazyImg {
 document.addEventListener('DOMContentLoaded', () => {
   LazyImg.init();
 });
-
     </script>
     </body>
 </html>
