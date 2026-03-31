@@ -37,6 +37,7 @@
     --topbar-height:42px;
     --case-width:200px;
     }
+    
     h2{
     font-size: 2.3rem;
     color: #00FFF4;
@@ -45,7 +46,7 @@
     background: linear-gradient(135deg,#4D2EFF,#0800FF75);    
     background-attachment: fixed;
     width: var(--body-width);
-    height: var(--body-height);
+   
     
     font-family:
      "Inter",
@@ -594,12 +595,7 @@
     <noscript>
     * 当前无script，请打开script。
     </noscript>
-    <!-- IE浏览器引导下载Edge的容器，默认隐藏 -->
-    <div id="ie-guide-layer" style="display: none;">
-     <div class="title">你的浏览器版本过低</div>
-     <div class="desc">当前使用的IE浏览器不支持本站所有功能，为获得更好的访问体验，请下载微软Edge浏览器</div>
-     <a href="https://www.microsoft.com/zh-cn/microsoft-edge/download" target="_blank" class="download-btn">立即下载Edge</a>
-    </div>
+    
 
     <div id="topbar">
      <label class="burger" for="burger">
@@ -612,12 +608,16 @@
     
     </div>
     <div id="navigation-box">
-     <div class="linkbox" href="#personal-introduction-box">简介</div>
-     <div class="linkbox" href="#case-show-box">案例展示 / 项目经验</div>
-     <div class="linkbox" href="#goodsentencesbox">名言警句</div>
-     <div class="linkbox" href="#ability-show">个人能力</div>
-     <div class="linkbox" href="#contactmebox">联系我</div>
-    </div>
+  
+    <!-- 注意：现在是 div 直接包含文字，不再包裹 a 标签 -->
+     <div class="linkbox" data-target="#personal-introduction-box">简介</div>
+     <div class="linkbox" data-target="#case-show-box">案例展示 / 项目经验</div>
+     <div class="linkbox" data-target="#goodsentencesbox">名言警句</div>
+     <div class="linkbox" data-target="#ability-show">个人能力</div>
+     <div class="linkbox" data-target="#contactmebox">联系我</div>
+   </div>
+
+    
     <div id="personal-introduction-box">
      <p class="welcomep"><span class="welcomespan">用代码构建秩序，用创新定义未来</span><span style="margin-top:7px;font-size:1.2rem;">欢迎来到我的个人网站:</span></p>
      <h1 id="name-show">朱凌瑀</h1>
@@ -686,43 +686,65 @@
     </div>
     <script>
     
-    // 检测是否为IE浏览器（全版本：IE6-IE11）
-function isIEBrowser() {
-  const userAgent = window.navigator.userAgent;
-  // 匹配IE6-10的UA特征 + IE11的rv:版本特征
-  return /MSIE|Trident\/7\.0|rv:11\.0/.test(userAgent);
-}
-// 检测到IE则显示引导层
-if (isIEBrowser()) {
-  document.getElementById('ie-guide-layer').style.display = 'flex';
-}
-    // 替换原burger点击代码
-const burger = document.getElementById('burger'); // 新增：获取DOM元素
-const navigationBox = document.getElementById('navigation-box');
-burger.addEventListener("change", () => { // 改用change事件，适配复选框
-  navigationBox.style.display = burger.checked ? "block" : "none";
-});
-    // 点击外部关闭导航框
-document.addEventListener('click', (e) => {
-  const isBurger = e.target.closest('.burger');
-  const isNav = e.target.closest('#navigation-box');
-  if (!isBurger && !isNav && burger.checked) {
-    burger.checked = false;
-    navigationBox.style.display = 'none';
-  }
-});
+  
 
-  // 鼠标滚轮上下滚动 → 名言区域左右滑动（核心代码）
 
-goodsentencesbox.addEventListener('wheel', (e) => {
-  e.preventDefault(); // 阻止默认的上下滚动行为
-  // 核心：把滚轮的上下偏移量(deltaY)转为横向滚动的偏移量
-  // 乘以0.5是滑动速度系数，数值越大滑得越快，可自行调整（推荐0.3-0.8）
-  goodsentencesbox.scrollBy({
-    left: e.deltaY * 0.5, 
-    behavior: 'smooth' // 平滑滑动，和原网站交互风格一致
+  // --- 1. 页面加载完成后执行 ---
+  document.addEventListener('DOMContentLoaded', function () {
+    
+    // 1.1 获取核心元素 (先找到这些按钮)
+    const burger = document.getElementById('burger');
+    const navigationBox = document.getElementById('navigation-box');
+    const linkBoxes = document.querySelectorAll('.linkbox');
+
+    // --- 2. 汉堡菜单开关逻辑 ---
+    burger?.addEventListener("change", () => {
+      // 如果菜单是勾选状态，就显示；否则隐藏
+      navigationBox.style.display = burger.checked ? "block" : "none";
+    });
+
+    // --- 3. 点击空白处关闭菜单 ---
+    document.addEventListener('click', (e) => {
+      // 检查点击的目标是不是菜单外面
+      const isClickInside = e.target.closest('.burger') || e.target.closest('#navigation-box');
+      // 如果不是点击在菜单或汉堡按钮上，且菜单是开着的
+      if (!isClickInside && burger.checked) {
+        burger.checked = false;
+        navigationBox.style.display = 'none';
+      }
+    });
+
+    // --- 4. 导航跳转核心逻辑 (修复版) ---
+    linkBoxes.forEach(function (box) {
+      box.addEventListener('click', function (e) {
+        
+        // 4.1 获取这个按钮要去的地方 (读取 data-target)
+        const targetId = this.getAttribute('data-target');
+        const targetElement = document.querySelector(targetId);
+
+        // 4.2 安全带：检查目的地是否存在
+        if (targetElement) {
+          // 4.3 先关闭菜单
+          burger.checked = false;
+          navigationBox.style.display = 'none';
+
+          // 4.4 执行平滑滚动
+          /*targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });*/
+          window.scrollTo({
+           top: targetElement.offsetTop - 50, // 偏移50px，避免顶到顶部
+           behavior: 'smooth' // 保留平滑滚动，兼容性比scrollIntoView更好
+          });
+        }
+      });
+    });
+
   });
-}, { passive: false }); // 必须加，否则preventDefault可能失效
+
+ 
+
 
      const textArr = [
        '代码是写给机器看的，逻辑是写给未来看的',
@@ -756,10 +778,10 @@ goodsentencesbox.addEventListener('wheel', (e) => {
      
      function createNextP() {
        if (index >= textArr.length) return
-       const centence = document.createElement('centence')
-       centence.innerHTML = textArr[index]
-       goodsentences.appendChild(centence)
-       centence.classList.add('sentence') // ✅ 直接加类名
+       const sentence = document.createElement('p')
+       sentence.innerText = textArr[index]
+       goodsentences.appendChild(sentence)
+       sentence.classList.add('sentence') // ✅ 直接加类名
        index++
        createNextP()
       
@@ -815,19 +837,7 @@ window.addEventListener('unload', () => {
 document.querySelectorAll('.more-case-p').forEach(el => {
   observer.observe(el);
 });
-// 导航链接点击跳转+平滑滚动
-document.querySelectorAll('.linkbox').forEach(box => {
-  const targetId = box.getAttribute('href');
-  box.addEventListener('click', () => {
-    // 跳转目标区域
-    document.querySelector(targetId).scrollIntoView({
-      behavior: 'smooth' // 平滑滚动  
-    });
-    // 跳转后自动关闭导航框
-    burger.checked = false;
-    navigationBox.style.display = 'none';  
-  });
-});
+
 
      
        
