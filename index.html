@@ -538,7 +538,8 @@
   #goodsentences{
   width: 3000px;
   display: flex;
-         
+  scrollbar-width: none;
+  -ms-overflow-style: none;       
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
@@ -561,7 +562,7 @@
   }
   .sentence:hover{
   transform: scale(1.07);
-  border: solid 1px #FFE400;
+  border: solid 2px #FFE400;
   }
   /* 响应式适配 */
   @media (max-width: 600px) {           
