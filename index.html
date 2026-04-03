@@ -714,7 +714,7 @@
    
    
    <div id="DataStatisticsBox">
-    <div id="visitsBox" title="点击刷新" onclick="refreshBusuanzi()">
+    <div id="visitsBox" title="点击刷新" onclick="window.location.reload()">
     总访问量：<span id="busuanzi_value_site_pv">0</span> 
     </div>
   
@@ -875,13 +875,7 @@ document.querySelectorAll('.more-case-p').forEach(el => {
 });
 
 
-  function refreshBusuanzi() {
-   // 强制重新请求不蒜子数据
-   if (window.busuanzi) {
-     busuanzi.load();
-     
-   }
- }
+  
        
        
 /*豆包科技——你值得拥有*/
