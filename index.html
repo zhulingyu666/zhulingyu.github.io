@@ -576,6 +576,7 @@
   }
   #visitsBox{
   color: white; 
+  cursor: pointer;
   }
   #visitsBox::after{
   content: "|";
@@ -713,12 +714,10 @@
    
    
    <div id="DataStatisticsBox">
-    <div id="visitsBox">
+    <div id="visitsBox" title="点击刷新" onclick="refreshBusuanzi()">
     总访问量：<span id="busuanzi_value_site_pv">0</span> 
     </div>
-   
-   
-   
+  
    </div>
 
     <script>
@@ -876,7 +875,13 @@ document.querySelectorAll('.more-case-p').forEach(el => {
 });
 
 
+  function refreshBusuanzi() {
+   // 强制重新请求不蒜子数据
+   if (window.busuanzi) {
+     busuanzi.load();
      
+   }
+ }
        
        
 /*豆包科技——你值得拥有*/
